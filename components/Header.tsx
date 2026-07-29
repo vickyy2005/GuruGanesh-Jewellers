@@ -13,6 +13,8 @@ interface HeaderProps {
   onNavigate: (view: 'home' | 'shop' | 'about' | 'contact') => void;
   onOpenStackBuilder?: () => void;
   onOpenSizeGuide?: () => void;
+  onOpenAbout?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,6 +29,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenStackBuilder,
   onOpenSizeGuide,
+  onOpenAbout,
+  onOpenContact,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -127,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Logo */}
             <div
               className="flex-shrink-0 flex items-center cursor-pointer group space-x-2"
-              onClick={() => handleNavClick({ label: 'HOME', type: 'nav', view: 'home', value: 'ALL' })}
+              onClick={() => handleNavClick({ label: 'HOME', view: 'home', value: 'ALL' })}
             >
               <Sparkles className="w-5 h-5 text-[#E89AB5] group-hover:rotate-12 transition-transform duration-500" />
               <span className="font-serif text-2xl sm:text-3xl tracking-[0.22em] font-normal text-[#1E1E1E] uppercase group-hover:text-[#FF6FA7] transition-colors duration-300">

@@ -95,7 +95,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                     >
                       {product.name}
                     </h4>
-                    <p className="text-[11px] text-[#999999] truncate">{product.finish}</p>
+                    <p className="text-[11px] text-[#999999] truncate">{product.material}</p>
                     <div className="text-xs font-bold text-[#1E1E1E]">
                       ₹{product.price.toLocaleString('en-IN')}
                     </div>

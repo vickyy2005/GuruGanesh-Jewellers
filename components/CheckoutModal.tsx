@@ -294,7 +294,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-lg" referrerPolicy="no-referrer" />
                         <div>
                           <div className="font-bold text-[#1E1E1E]">{item.product.name}</div>
-                          <div className="text-[10px] text-[#999999]">Qty: {item.quantity} • {item.product.finish}</div>
+                          <div className="text-[10px] text-[#999999]">Qty: {item.quantity} • {item.selectedVariant || item.product.material}</div>
                         </div>
                       </div>
                       <div className="font-bold text-[#1E1E1E]">₹{(item.product.price * item.quantity).toLocaleString('en-IN')}</div>
