@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Check,
   ChevronRight,
+  X,
 } from 'lucide-react';
 
 interface ShopPageProps {
@@ -36,6 +37,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [wishlistedIds, setWishlistedIds] = useState<Record<string, boolean>>({});
+  const [mobileFilterOpen, setMobileFilterOpen] = useState<boolean>(false);
 
   const toggleWishlist = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -89,17 +91,141 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     { label: 'SPECIAL SALE', val: 'SALE', count: PRODUCTS.filter((p) => p.isSale).length },
   ];
 
+  const renderFilterContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between border-b border-[#FDEEF3] pb-4">
+        <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1E1E1E] flex items-center space-x-2">
+          <SlidersHorizontal className="w-4 h-4 text-[#FF6FA7]" />
+          <span>BOUTIQUE FILTERS</span>
+        </h3>
+        <button
+          onClick={resetFilters}
+          className="text-[10px] font-bold text-[#FF6FA7] hover:underline uppercase flex items-center space-x-1"
+        >
+          <RotateCcw className="w-3 h-3" />
+          <span>RESET</span>
+        </button>
+      </div>
+
+      {/* 1. Category Selection */}
+      <div className="space-y-2">
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
+          CATEGORIES
+        </label>
+        <div className="space-y-1">
+          {categoriesWithCounts.map((cat) => {
+            const isAct = selectedCategory === cat.val;
+            return (
+              <button
+                key={cat.val}
+                onClick={() => {
+                  onCategoryChange(cat.val);
+                  setMobileFilterOpen(false);
+                }}
+                className={`w-full flex items-center justify-between text-xs px-3 py-2 rounded-xl font-bold transition-all text-left ${
+                  isAct
+                    ? 'bg-[#FF6FA7] text-white shadow-xs'
+                    : 'text-[#666666] hover:bg-[#FFF0F5] hover:text-[#1E1E1E]'
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    isAct ? 'bg-white/20 text-white' : 'bg-[#FDEEF3] text-[#FF6FA7]'
+                  }`}
+                >
+                  {cat.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Price Range Slider */}
+      <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
+        <div className="flex items-center justify-between">
+          <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
+            MAX PRICE
+          </label>
+          <span className="text-xs font-bold text-[#FF6FA7]">
+            ₹{maxPrice.toLocaleString('en-IN')}
+          </span>
+        </div>
+        <input
+          type="range"
+          min={5000}
+          max={20000}
+          step={500}
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(Number(e.target.value))}
+          className="w-full accent-[#FF6FA7] cursor-pointer"
+        />
+        <div className="flex justify-between text-[10px] text-[#999999] font-bold">
+          <span>₹5,000</span>
+          <span>₹20,000</span>
+        </div>
+      </div>
+
+      {/* 3. Material Finish */}
+      <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
+          FINISH &amp; MATERIAL
+        </label>
+        <select
+          value={selectedMaterial}
+          onChange={(e) => setSelectedMaterial(e.target.value)}
+          className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+        >
+          <option value="ALL">All Precious Metals</option>
+          <option value="Rose Gold">18K Rose Gold Vermeil</option>
+          <option value="Sterling Silver">Solid 925 Sterling Silver</option>
+        </select>
+      </div>
+
+      {/* 4. Gemstones */}
+      <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
+          GEMSTONE ACCENT
+        </label>
+        <select
+          value={selectedStone}
+          onChange={(e) => setSelectedStone(e.target.value)}
+          className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+        >
+          <option value="ALL">All Gemstones &amp; Crystals</option>
+          <option value="Swarovski">Hand-Set Swarovski Crystal</option>
+          <option value="Diamond">Ethical Diamond Accent</option>
+          <option value="Rose Quartz">Natural Rose Quartz</option>
+        </select>
+      </div>
+
+      {/* 5. In-Stock Only Toggle */}
+      <div className="border-t border-[#FDEEF3] pt-4">
+        <label className="flex items-center space-x-2 text-xs font-semibold text-[#1E1E1E] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={inStockOnly}
+            onChange={(e) => setInStockOnly(e.target.checked)}
+            className="accent-[#FF6FA7] w-4 h-4"
+          />
+          <span>In-Stock Pieces Only</span>
+        </label>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-[#FFF0F5] min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto animate-fade-in select-none">
       
       {/* Clean Unboxed Editorial Header */}
-      <div className="text-center mb-10 space-y-3 pt-2">
+      <div className="text-center mb-8 sm:mb-10 space-y-3 pt-2">
         <span className="text-[11px] tracking-[0.3em] font-bold text-[#FF6FA7] uppercase flex items-center justify-center space-x-1.5">
           <Sparkles className="w-3.5 h-3.5 text-[#FF6FA7]" />
           <span>FINE HANDCRAFTED 18K VERMEIL</span>
         </span>
 
-        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1E1E1E] tracking-wider uppercase">
+        <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-normal text-[#1E1E1E] tracking-wider uppercase">
           {selectedCategory === 'ALL'
             ? 'THE BOUTIQUE CATALOGUE'
             : selectedCategory === 'NEW'
@@ -116,140 +242,49 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </p>
       </div>
 
-      {/* Main 2-Column Layout: Permanent Left Sidebar Filters (3 cols) + Right Product Grid (9 cols) */}
+      {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Side Permanent Filter Sidebar (3 cols) */}
-        <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-[rgba(233,170,194,0.25)] luxury-card-shadow space-y-6 lg:sticky lg:top-24">
-          
-          <div className="flex items-center justify-between border-b border-[#FDEEF3] pb-4">
-            <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1E1E1E] flex items-center space-x-2">
-              <SlidersHorizontal className="w-4 h-4 text-[#FF6FA7]" />
-              <span>BOUTIQUE FILTERS</span>
-            </h3>
-            <button
-              onClick={resetFilters}
-              className="text-[10px] font-bold text-[#FF6FA7] hover:underline uppercase flex items-center space-x-1"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>RESET</span>
-            </button>
-          </div>
-
-          {/* 1. Category Selection */}
-          <div className="space-y-2">
-            <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-              CATEGORIES
-            </label>
-            <div className="space-y-1">
-              {categoriesWithCounts.map((cat) => {
-                const isAct = selectedCategory === cat.val;
-                return (
-                  <button
-                    key={cat.val}
-                    onClick={() => onCategoryChange(cat.val)}
-                    className={`w-full flex items-center justify-between text-xs px-3 py-2 rounded-xl font-bold transition-all text-left ${
-                      isAct
-                        ? 'bg-[#FF6FA7] text-white shadow-xs'
-                        : 'text-[#666666] hover:bg-[#FFF0F5] hover:text-[#1E1E1E]'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full ${
-                        isAct ? 'bg-white/20 text-white' : 'bg-[#FDEEF3] text-[#FF6FA7]'
-                      }`}
-                    >
-                      {cat.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 2. Price Range Slider */}
-          <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
-            <div className="flex items-center justify-between">
-              <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-                MAX PRICE
-              </label>
-              <span className="text-xs font-bold text-[#FF6FA7]">
-                ₹{maxPrice.toLocaleString('en-IN')}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="5000"
-              max="20000"
-              step="500"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-[#FF6FA7]"
-            />
-            <div className="flex justify-between text-[10px] text-[#666666] font-semibold">
-              <span>₹5,000</span>
-              <span>₹20,000</span>
-            </div>
-          </div>
-
-          {/* 3. Material Finish */}
-          <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
-            <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-              MATERIAL FINISH
-            </label>
-            <select
-              value={selectedMaterial}
-              onChange={(e) => setSelectedMaterial(e.target.value)}
-              className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-semibold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
-            >
-              <option value="ALL">All Materials</option>
-              <option value="Rose Gold">18k Rose Gold Vermeil</option>
-              <option value="Silver">925 Sterling Silver</option>
-              <option value="Brass">Gold Plated Brass</option>
-            </select>
-          </div>
-
-          {/* 4. Gemstone Accents */}
-          <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
-            <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-              GEMSTONE ACCENTS
-            </label>
-            <select
-              value={selectedStone}
-              onChange={(e) => setSelectedStone(e.target.value)}
-              className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-semibold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
-            >
-              <option value="ALL">All Gemstones</option>
-              <option value="Sapphire">Pink Sapphire</option>
-              <option value="Quartz">Rose Quartz</option>
-              <option value="Swarovski">Swarovski Crystals</option>
-              <option value="Diamond">Pink Diamond Simulants</option>
-            </select>
-          </div>
-
-          {/* 5. In-Stock Only Toggle */}
-          <div className="border-t border-[#FDEEF3] pt-4">
-            <label className="flex items-center space-x-2 text-xs font-semibold text-[#1E1E1E] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={(e) => setInStockOnly(e.target.checked)}
-                className="accent-[#FF6FA7] w-4 h-4"
-              />
-              <span>In-Stock Pieces Only</span>
-            </label>
-          </div>
-
+        {/* Permanent Left Filter Sidebar (Desktop lg:block) */}
+        <aside className="hidden lg:block lg:col-span-3 bg-white p-6 rounded-2xl border border-[rgba(233,170,194,0.25)] luxury-card-shadow lg:sticky lg:top-24">
+          {renderFilterContent()}
         </aside>
 
-        {/* Right Side Product Grid (9 cols) */}
+        {/* Mobile & Tablet Slide-Over Filter Drawer */}
+        {mobileFilterOpen && (
+          <div className="fixed inset-0 z-50 overflow-hidden lg:hidden animate-fade-in">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-xs" onClick={() => setMobileFilterOpen(false)} />
+            <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-white p-6 overflow-y-auto shadow-2xl z-10 space-y-6">
+              <div className="flex justify-between items-center pb-3 border-b border-[#FDEEF3]">
+                <h3 className="font-serif text-lg font-bold text-[#1E1E1E]">FILTERS</h3>
+                <button onClick={() => setMobileFilterOpen(false)} className="p-2 text-[#666666] hover:text-[#FF6FA7]">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              {renderFilterContent()}
+            </div>
+          </div>
+        )}
+
+        {/* Right Side Product Grid */}
         <main className="lg:col-span-9 space-y-6">
           
-          {/* Top Sort & Results Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between bg-white p-4 border border-[rgba(233,170,194,0.25)] rounded-2xl luxury-card-shadow gap-4">
-            <div className="text-xs font-semibold text-[#666666]">
-              Showing <span className="text-[#FF6FA7] font-bold">{filtered.length}</span> luxury pieces
+          {/* Top Mobile Filter Toggle & Sort Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-4 border border-[rgba(233,170,194,0.25)] rounded-2xl luxury-card-shadow gap-3">
+            
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-[#666666]">
+                Showing <span className="text-[#FF6FA7] font-bold">{filtered.length}</span> luxury pieces
+              </div>
+
+              {/* Mobile Filter Button */}
+              <button
+                onClick={() => setMobileFilterOpen(true)}
+                className="lg:hidden btn-pink-luxury text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 uppercase"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>FILTERS</span>
+              </button>
             </div>
 
             <div className="flex items-center space-x-2 text-xs font-semibold text-[#1E1E1E]">
@@ -257,7 +292,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl px-3.5 py-2 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+                className="w-full sm:w-auto bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl px-3.5 py-2 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
               >
                 <option value="featured">Featured Picks</option>
                 <option value="price-low">Price: Low to High</option>
