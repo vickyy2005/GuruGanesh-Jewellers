@@ -37,8 +37,13 @@ export const Hero: React.FC<HeroProps> = ({ onExplore }) => {
     };
   }, []);
 
-  const headline = "ELEVATE EVERY MOMENT.";
-  const letters = headline.split("");
+  const words = [
+    { word: "ELEVATE", chars: "ELEVATE".split("") },
+    { word: "EVERY", chars: "EVERY".split("") },
+    { word: "MOMENT.", chars: "MOMENT.".split("") },
+  ];
+
+  let charGlobalCounter = 0;
 
   return (
     <section className="relative w-full min-h-[480px] sm:min-h-[540px] lg:min-h-[600px] flex items-center justify-start overflow-hidden bg-[#FFF8FA] border-b border-[rgba(233,170,194,0.2)]">
@@ -82,7 +87,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore }) => {
 
       {/* 4. Luxury Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full py-14 sm:py-20 lg:py-24">
-        <div className="max-w-xl lg:max-w-2xl">
+        <div className="max-w-xl lg:max-w-3xl">
           
           {/* Subtitle Badge */}
           <div
@@ -95,30 +100,29 @@ export const Hero: React.FC<HeroProps> = ({ onExplore }) => {
             <span>SWAROVSKI &amp; ROSE GOLD FINE JEWELRY</span>
           </div>
 
-          {/* Letter-by-Letter Sequential Headline Reveal */}
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-normal text-[#1E1E1E] tracking-tight leading-[1.08] uppercase mb-6 flex flex-wrap">
-            {letters.map((char, idx) => {
-              if (char === " ") {
-                return <span key={idx} className="w-[0.35em]" />;
-              }
-              const delayMs = 200 + idx * 40;
-              return (
-                <span
-                  key={idx}
-                  className="inline-block overflow-hidden py-1"
-                >
-                  <span
-                    className="inline-block will-change-transform"
-                    style={{
-                      animation: isLoaded ? `letterReveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.25) ${delayMs}ms forwards` : 'none',
-                      opacity: isLoaded ? undefined : 0,
-                    }}
-                  >
-                    {char}
-                  </span>
-                </span>
-              );
-            })}
+          {/* Single-Line Fluid Headline with Intact Words */}
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-normal text-[#1E1E1E] tracking-tight leading-[1.08] uppercase mb-6 flex flex-wrap gap-x-3 sm:gap-x-4 whitespace-nowrap">
+            {words.map((wObj, wIdx) => (
+              <span key={wIdx} className="inline-block whitespace-nowrap">
+                {wObj.chars.map((char) => {
+                  charGlobalCounter += 1;
+                  const delayMs = 200 + charGlobalCounter * 35;
+                  return (
+                    <span key={charGlobalCounter} className="inline-block overflow-hidden py-1">
+                      <span
+                        className="inline-block will-change-transform"
+                        style={{
+                          animation: isLoaded ? `letterReveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.25) ${delayMs}ms forwards` : 'none',
+                          opacity: isLoaded ? undefined : 0,
+                        }}
+                      >
+                        {char}
+                      </span>
+                    </span>
+                  );
+                })}
+              </span>
+            ))}
           </h1>
 
           {/* Description Animation */}
