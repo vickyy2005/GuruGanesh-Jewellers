@@ -37,6 +37,9 @@ export const Hero: React.FC<HeroProps> = ({ onExplore }) => {
     };
   }, []);
 
+  const headline = "ELEVATE EVERY MOMENT.";
+  const letters = headline.split("");
+
   const words = [
     { word: "ELEVATE", chars: "ELEVATE".split("") },
     { word: "EVERY", chars: "EVERY".split("") },
