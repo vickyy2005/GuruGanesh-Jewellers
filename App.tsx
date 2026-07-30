@@ -247,6 +247,7 @@ export default function App() {
                 setActiveCategory('ALL');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
+              onOpenStackBuilder={() => setIsStackBuilderOpen(true)}
             />
 
             {/* 2. Main Categories Grid */}
