@@ -48,6 +48,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Cursor zoom state
   const [zoomPos, setZoomPos] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false });
+  const [isZoomActive, setIsZoomActive] = useState<boolean>(false);
 
   // Scroll to top when product changes
   useEffect(() => {
@@ -57,7 +58,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setSelectedSize(product.sizes?.[0] || '');
     setQuantity(1);
     setIsWishlisted(false);
+    setIsZoomActive(false);
   }, [product]);
+
+  useEffect(() => {
+    setIsZoomActive(false);
+  }, [selectedImage]);
 
   const galleryImages = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
 
@@ -76,6 +82,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomActive) return;
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
@@ -116,11 +123,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         {/* Left Column: Image Gallery (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           
-          {/* Main Image Container with Cursor Magnifier Zoom & Slide Arrows */}
+          {/* Main Image Container with Click-to-Activate Magnifier Zoom & Slide Arrows */}
           <div
+            onClick={() => setIsZoomActive(!isZoomActive)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            className="relative aspect-square w-full bg-[#FFF0F5]/50 rounded-2xl overflow-hidden group border border-[rgba(233,170,194,0.25)] shadow-sm cursor-zoom-in"
+            className={`relative aspect-square w-full bg-[#FFF0F5]/50 rounded-2xl overflow-hidden group border transition-all duration-300 ${
+              isZoomActive
+                ? 'border-[#FF6FA7] shadow-lg cursor-zoom-out'
+                : 'border-[rgba(233,170,194,0.25)] shadow-sm cursor-pointer'
+            }`}
           >
             <img
               src={selectedImage}
@@ -128,18 +140,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               className="w-full h-full object-cover object-center transition-transform duration-200 ease-out will-change-transform"
               style={{
                 transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                transform: zoomPos.show ? 'scale(2.2)' : 'scale(1)',
+                transform: isZoomActive && zoomPos.show ? 'scale(2.4)' : 'scale(1)',
               }}
               referrerPolicy="no-referrer"
             />
 
-            {/* Hover Zoom Hint */}
-            {!zoomPos.show && (
-              <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50 text-[10px] font-bold text-[#1E1E1E] flex items-center space-x-1 shadow-xs pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
-                <ZoomIn className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                <span>Hover to Zoom Details</span>
-              </div>
-            )}
+            {/* Click to Zoom Badge */}
+            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/60 text-[10px] font-bold text-[#1E1E1E] flex items-center space-x-1.5 shadow-xs pointer-events-none transition-all">
+              <ZoomIn className={`w-3.5 h-3.5 ${isZoomActive ? 'text-[#FF6FA7] animate-pulse' : 'text-[#666666]'}`} />
+              <span>{isZoomActive ? 'Zoom Active • Move Cursor (Click to Exit)' : 'Click Image to Zoom'}</span>
+            </div>
 
             {/* Left Slide Arrow */}
             {galleryImages.length > 1 && (
