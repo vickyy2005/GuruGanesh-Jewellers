@@ -69,9 +69,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
           {/* Announcement Message */}
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#FF6FA7] animate-pulse" />
-            <span className="tracking-[0.18em] uppercase font-light text-white/90">
+          <div className="flex items-center space-x-1.5 overflow-hidden">
+            <Sparkles className="w-3.5 h-3.5 text-[#FF6FA7] animate-pulse flex-shrink-0" />
+            <span className="tracking-[0.1em] sm:tracking-[0.18em] uppercase font-light text-white/90 text-[9px] sm:text-[11px] truncate">
               FREE INSURED EXPRESS SHIPPING &amp; 2-YEAR GUARANTEE
             </span>
           </div>
@@ -133,8 +133,8 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex-shrink-0 flex items-center cursor-pointer group space-x-2"
               onClick={() => handleNavClick({ label: 'HOME', view: 'home', value: 'ALL' })}
             >
-              <Sparkles className="w-5 h-5 text-[#E89AB5] group-hover:rotate-12 transition-transform duration-500" />
-              <span className="font-serif text-2xl sm:text-3xl tracking-[0.22em] font-normal text-[#1E1E1E] uppercase group-hover:text-[#FF6FA7] transition-colors duration-300">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#E89AB5] group-hover:rotate-12 transition-transform duration-500 flex-shrink-0" />
+              <span className="font-serif text-lg xs:text-xl sm:text-3xl tracking-[0.14em] sm:tracking-[0.22em] font-normal text-[#1E1E1E] uppercase group-hover:text-[#FF6FA7] transition-colors duration-300">
                 GURU GANESH
               </span>
             </div>
