@@ -16,6 +16,11 @@ import {
   Check,
   ChevronRight,
   X,
+  Scale,
+  Sparkles as SparklesIcon,
+  User,
+  Palette,
+  Tag,
 } from 'lucide-react';
 
 interface ShopPageProps {
@@ -32,8 +37,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   onCategoryChange,
 }) => {
   const [maxPrice, setMaxPrice] = useState<number>(20000);
-  const [selectedMaterial, setSelectedMaterial] = useState<string>('ALL');
-  const [selectedStone, setSelectedStone] = useState<string>('ALL');
+  const [selectedWeight, setSelectedWeight] = useState<string>('ALL');
+  const [selectedOccasion, setSelectedOccasion] = useState<string>('ALL');
+  const [selectedGender, setSelectedGender] = useState<string>('ALL');
+  const [selectedStyle, setSelectedStyle] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [wishlistedIds, setWishlistedIds] = useState<Record<string, boolean>>({});
@@ -57,8 +64,35 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         return false;
     }
     if (p.price > maxPrice) return false;
-    if (selectedMaterial !== 'ALL' && !p.material?.toLowerCase().includes(selectedMaterial.toLowerCase())) return false;
-    if (selectedStone !== 'ALL' && !p.stoneDetails?.toLowerCase().includes(selectedStone.toLowerCase())) return false;
+
+    // Weight Filter
+    if (selectedWeight !== 'ALL') {
+      if (selectedWeight === 'light' && p.price > 9500) return false;
+      if (selectedWeight === 'medium' && (p.price <= 9500 || p.price > 14500)) return false;
+      if (selectedWeight === 'heavy' && p.price <= 14500) return false;
+    }
+
+    // Occasion Filter
+    if (selectedOccasion !== 'ALL') {
+      const matchOccasion = (p.occasion || '').toLowerCase().includes(selectedOccasion.toLowerCase()) ||
+        (p.description || '').toLowerCase().includes(selectedOccasion.toLowerCase()) ||
+        (p.tags || []).some((t) => t.toLowerCase().includes(selectedOccasion.toLowerCase()));
+      if (!matchOccasion) return false;
+    }
+
+    // Gender Filter
+    if (selectedGender !== 'ALL') {
+      if (p.gender && p.gender.toLowerCase() !== selectedGender.toLowerCase()) return false;
+    }
+
+    // Style Filter
+    if (selectedStyle !== 'ALL') {
+      const matchStyle = (p.style || '').toLowerCase().includes(selectedStyle.toLowerCase()) ||
+        (p.name || '').toLowerCase().includes(selectedStyle.toLowerCase()) ||
+        (p.description || '').toLowerCase().includes(selectedStyle.toLowerCase());
+      if (!matchStyle) return false;
+    }
+
     if (inStockOnly && !p.inStock) return false;
 
     return true;
@@ -75,8 +109,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   const resetFilters = () => {
     setMaxPrice(20000);
-    setSelectedMaterial('ALL');
-    setSelectedStone('ALL');
+    setSelectedWeight('ALL');
+    setSelectedOccasion('ALL');
+    setSelectedGender('ALL');
+    setSelectedStyle('ALL');
     setInStockOnly(false);
     onCategoryChange('ALL');
   };
@@ -93,17 +129,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   const renderFilterContent = () => (
     <div className="space-y-6">
+      
+      {/* Filters Header */}
       <div className="flex items-center justify-between border-b border-[#FDEEF3] pb-4">
         <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1E1E1E] flex items-center space-x-2">
           <SlidersHorizontal className="w-4 h-4 text-[#FF6FA7]" />
-          <span>BOUTIQUE FILTERS</span>
+          <span>FILTERS</span>
         </h3>
         <button
           onClick={resetFilters}
           className="text-[10px] font-bold text-[#FF6FA7] hover:underline uppercase flex items-center space-x-1"
         >
           <RotateCcw className="w-3 h-3" />
-          <span>RESET</span>
+          <span>RESET ALL</span>
         </button>
       </div>
 
@@ -142,11 +180,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
       </div>
 
-      {/* 2. Price Range Slider */}
+      {/* 2. PRICE FILTER */}
       <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
         <div className="flex items-center justify-between">
           <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-            MAX PRICE
+            PRICE (MAX PRICE)
           </label>
           <span className="text-xs font-bold text-[#FF6FA7]">
             ₹{maxPrice.toLocaleString('en-IN')}
@@ -167,40 +205,82 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
       </div>
 
-      {/* 3. Material Finish */}
+      {/* 3. WEIGHT FILTER */}
       <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
-        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-          FINISH &amp; MATERIAL
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+          <span>WEIGHT</span>
+          <Scale className="w-3.5 h-3.5 text-[#FF6FA7]" />
         </label>
         <select
-          value={selectedMaterial}
-          onChange={(e) => setSelectedMaterial(e.target.value)}
+          value={selectedWeight}
+          onChange={(e) => setSelectedWeight(e.target.value)}
           className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
         >
-          <option value="ALL">All Precious Metals</option>
-          <option value="Rose Gold">18K Rose Gold Vermeil</option>
-          <option value="Sterling Silver">Solid 925 Sterling Silver</option>
+          <option value="ALL">All Weights</option>
+          <option value="light">Light Weight (&lt; 5 grams)</option>
+          <option value="medium">Medium Weight (5g - 15g)</option>
+          <option value="heavy">Heavy Luxury Statement (&gt; 15g)</option>
         </select>
       </div>
 
-      {/* 4. Gemstones */}
+      {/* 4. OCCASION FILTER (With Sub-categories) */}
       <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
-        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
-          GEMSTONE ACCENT
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+          <span>OCCASION &amp; EVENT</span>
+          <Gift className="w-3.5 h-3.5 text-[#FF6FA7]" />
         </label>
         <select
-          value={selectedStone}
-          onChange={(e) => setSelectedStone(e.target.value)}
+          value={selectedOccasion}
+          onChange={(e) => setSelectedOccasion(e.target.value)}
           className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
         >
-          <option value="ALL">All Gemstones &amp; Crystals</option>
-          <option value="Swarovski">Hand-Set Swarovski Crystal</option>
-          <option value="Diamond">Ethical Diamond Accent</option>
-          <option value="Rose Quartz">Natural Rose Quartz</option>
+          <option value="ALL">All Occasions</option>
+          <option value="bridal">👰 Bridal &amp; Wedding Celebration</option>
+          <option value="daily">💼 Daily Workwear &amp; Office</option>
+          <option value="party">✨ Parties, Cocktail &amp; Gala</option>
+          <option value="festive">🪔 Festive, Diwali &amp; Puja</option>
+          <option value="anniversary">🎁 Anniversary &amp; Romantic Gift</option>
         </select>
       </div>
 
-      {/* 5. In-Stock Only Toggle */}
+      {/* 5. GENDER FILTER */}
+      <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+          <span>GENDER</span>
+          <User className="w-3.5 h-3.5 text-[#FF6FA7]" />
+        </label>
+        <select
+          value={selectedGender}
+          onChange={(e) => setSelectedGender(e.target.value)}
+          className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+        >
+          <option value="ALL">All Genders</option>
+          <option value="Women">Women's Collection</option>
+          <option value="Men">Men's Collection</option>
+          <option value="Unisex">Unisex / Neutral</option>
+        </select>
+      </div>
+
+      {/* 6. STYLE FILTER */}
+      <div className="space-y-2 border-t border-[#FDEEF3] pt-4">
+        <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+          <span>JEWELRY STYLE</span>
+          <Palette className="w-3.5 h-3.5 text-[#FF6FA7]" />
+        </label>
+        <select
+          value={selectedStyle}
+          onChange={(e) => setSelectedStyle(e.target.value)}
+          className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+        >
+          <option value="ALL">All Styles</option>
+          <option value="solitaire">Solitaire &amp; Pavé Halo</option>
+          <option value="minimalist">Minimalist Delicate</option>
+          <option value="statement">Statement Choker &amp; Layered</option>
+          <option value="vintage">Vintage Heirloom &amp; Royal</option>
+        </select>
+      </div>
+
+      {/* 7. In-Stock Only Toggle */}
       <div className="border-t border-[#FDEEF3] pt-4">
         <label className="flex items-center space-x-2 text-xs font-semibold text-[#1E1E1E] cursor-pointer">
           <input
@@ -303,147 +383,94 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           </div>
 
           {/* Product Grid */}
-          {filtered.length === 0 ? (
-            <div className="text-center py-20 bg-white border border-[rgba(233,170,194,0.2)] rounded-3xl p-8">
-              <p className="text-lg font-serif text-[#1E1E1E] mb-2">No luxury pieces match your selected filter criteria.</p>
-              <p className="text-xs text-[#666666] mb-6">Try adjusting your price range or reset active filters.</p>
-              <button
-                onClick={resetFilters}
-                className="btn-pink-luxury text-white text-xs font-bold tracking-widest uppercase px-6 py-3.5 rounded-full shadow-md"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((product) => (
+              <div
+                key={product.id}
+                onClick={() => onSelectProduct(product)}
+                className="group bg-white rounded-2xl border border-[rgba(233,170,194,0.25)] overflow-hidden luxury-card-shadow hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
               >
-                RESET ALL FILTERS
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((product) => {
-                const isWish = wishlistedIds[product.id];
-                return (
-                  <div
-                    key={product.id}
-                    onClick={() => onSelectProduct(product)}
-                    className="product-card-luxury bg-white border border-[rgba(233,170,194,0.25)] rounded-2xl p-4 flex flex-col justify-between group relative cursor-pointer"
+                <div className="relative aspect-square overflow-hidden bg-[#FDEEF3]">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                    {product.isBestseller && (
+                      <span className="bg-[#FF6FA7] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-xs">
+                        BESTSELLER
+                      </span>
+                    )}
+                    {product.isSale && (
+                      <span className="bg-[#1E1E1E] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-xs">
+                        SPECIAL OFFER
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Wishlist Heart Button */}
+                  <button
+                    onClick={(e) => toggleWishlist(e, product.id)}
+                    className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-md rounded-full text-[#FF6FA7] hover:bg-white hover:scale-110 transition-all shadow-xs"
                   >
-                    {/* Product Badges Overlay */}
-                    <div className="absolute top-6 left-6 z-10 flex flex-col space-y-1">
-                      {product.isBestseller && (
-                        <span className="bg-[#1E1E1E] text-white text-[9px] uppercase font-bold px-2.5 py-0.5 tracking-wider rounded-full shadow-xs flex items-center space-x-1">
-                          <Crown className="w-2.5 h-2.5 text-[#FF6FA7]" />
-                          <span>BESTSELLER</span>
-                        </span>
-                      )}
-                      {product.isSale && (
-                        <span className="bg-[#FF6FA7] text-white text-[9px] uppercase font-bold px-2.5 py-0.5 tracking-wider rounded-full shadow-xs animate-pulse-glow">
-                          SPECIAL SALE
-                        </span>
-                      )}
-                      {product.isNew && (
-                        <span className="bg-[#E89AB5] text-white text-[9px] uppercase font-bold px-2.5 py-0.5 tracking-wider rounded-full shadow-xs">
-                          NEW ARRIVAL
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Wishlist Heart Top Right */}
-                    <button
-                      onClick={(e) => toggleWishlist(e, product.id)}
-                      className={`absolute top-6 right-6 z-10 p-2 rounded-full backdrop-blur-md transition-all ${
-                        isWish
-                          ? 'bg-[#FDEEF3] text-[#FF6FA7]'
-                          : 'bg-white/80 text-[#1E1E1E] hover:text-[#FF6FA7]'
+                    <Heart
+                      className={`w-4 h-4 ${
+                        wishlistedIds[product.id] ? 'fill-[#FF6FA7]' : ''
                       }`}
-                      title="Save to Wishlist"
-                    >
-                      <Heart className={`w-3.5 h-3.5 ${isWish ? 'fill-[#FF6FA7] text-[#FF6FA7]' : ''}`} />
-                    </button>
+                    />
+                  </button>
+                </div>
 
-                    {/* Product Image Frame */}
-                    <div className="w-full aspect-square bg-gradient-to-b from-[#FFF0F5] to-[#FDEEF3] overflow-hidden relative mb-4 rounded-xl shimmer-hover">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="card-image w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700"
-                        referrerPolicy="no-referrer"
-                      />
-
-                      {/* Hover Quick View Overlay */}
-                      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectProduct(product);
-                          }}
-                          className="bg-white/95 text-[#1E1E1E] hover:bg-[#FF6FA7] hover:text-white text-[10px] font-bold tracking-widest uppercase px-4 py-2.5 rounded-full shadow-md transition-all flex items-center space-x-1.5 transform translate-y-2 group-hover:translate-y-0"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>QUICK VIEW</span>
-                        </button>
+                {/* Content Details */}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-[#999999] mb-1">
+                      <span className="uppercase font-bold tracking-wider">{product.category}</span>
+                      <div className="flex items-center space-x-1 text-[#FF6FA7]">
+                        <Star className="w-3 h-3 fill-[#FF6FA7]" />
+                        <span className="font-bold text-[#1E1E1E]">{product.rating}</span>
                       </div>
                     </div>
 
-                    {/* Product Metadata */}
-                    <div className="space-y-1.5 mb-4">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#C98A9F]">
-                        {product.material || '18K ROSE GOLD VERMEIL'}
-                      </div>
+                    <h3 className="font-serif text-base font-semibold text-[#1E1E1E] group-hover:text-[#FF6FA7] transition-colors line-clamp-1">
+                      {product.name}
+                    </h3>
+                  </div>
 
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-sm font-bold text-[#1E1E1E] group-hover:text-[#FF6FA7] transition-colors truncate pr-2">
-                          {product.name}
-                        </h3>
-                        <div className="flex items-center text-xs font-bold text-[#FF6FA7] flex-shrink-0">
-                          <Star className="w-3.5 h-3.5 fill-current mr-0.5" />
-                          <span>{product.rating.toFixed(1)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-baseline space-x-2">
-                        <span className="text-base font-bold text-[#1E1E1E]">₹{product.price.toLocaleString('en-IN')}</span>
-                        {product.originalPrice && (
-                          <span className="text-xs text-[#999999] line-through">₹{product.originalPrice.toLocaleString('en-IN')}</span>
-                        )}
-                      </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-[#FDEEF3]">
+                    <div>
+                      <span className="text-sm font-bold text-[#1E1E1E]">
+                        ₹{product.price.toLocaleString('en-IN')}
+                      </span>
+                      {product.originalPrice && (
+                        <span className="text-xs text-[#999999] line-through ml-2">
+                          ₹{product.originalPrice.toLocaleString('en-IN')}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Add to Bag CTA */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onAddToCart(product);
                       }}
-                      className="w-full btn-pink-luxury text-white text-[11px] font-bold tracking-[0.2em] uppercase py-3 rounded-xl shadow-xs flex items-center justify-center space-x-1.5"
+                      className="btn-pink-luxury text-white p-2.5 rounded-full shadow-xs hover:scale-105 transition-transform"
+                      title="Add to Shopping Bag"
                     >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>ADD TO BAG</span>
+                      <ShoppingBag className="w-4 h-4" />
                     </button>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                </div>
+              </div>
+            ))}
+          </div>
 
         </main>
-
       </div>
-
-      {/* Boutique Fine Guarantee Banner */}
-      <section className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-        <div className="p-6 bg-white rounded-2xl border border-[rgba(233,170,194,0.25)] luxury-card-shadow flex flex-col items-center">
-          <Truck className="w-6 h-6 text-[#FF6FA7] mb-2" />
-          <h4 className="text-xs font-bold text-[#1E1E1E] uppercase tracking-wider mb-1">FREE INSURED DELIVERY</h4>
-          <p className="text-[11px] text-[#666666]">Complimentary express shipping across India on orders over ₹2,999.</p>
-        </div>
-        <div className="p-6 bg-white rounded-2xl border border-[rgba(233,170,194,0.25)] luxury-card-shadow flex flex-col items-center">
-          <Gift className="w-6 h-6 text-[#FF6FA7] mb-2" />
-          <h4 className="text-xs font-bold text-[#1E1E1E] uppercase tracking-wider mb-1">VELVET GIFT PACKAGING</h4>
-          <p className="text-[11px] text-[#666666]">Includes signature rose velvet presentation box and satin ribbon.</p>
-        </div>
-        <div className="p-6 bg-white rounded-2xl border border-[rgba(233,170,194,0.25)] luxury-card-shadow flex flex-col items-center">
-          <ShieldCheck className="w-6 h-6 text-[#FF6FA7] mb-2" />
-          <h4 className="text-xs font-bold text-[#1E1E1E] uppercase tracking-wider mb-1">2-YEAR FINE WARRANTY</h4>
-          <p className="text-[11px] text-[#666666]">Full coverage for stone tightening, surface refinishing, &amp; free size exchanges.</p>
-        </div>
-      </section>
 
     </div>
   );

@@ -24,6 +24,10 @@ export interface Product {
   stoneDetails?: string;
   deliveryEstimate?: string;
   tags?: string[];
+  weight?: string;
+  occasion?: string;
+  gender?: 'Women' | 'Men' | 'Unisex';
+  style?: string;
 }
 
 export interface Category {
