@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, Sparkles, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, Sparkles, CheckCircle2, MessageSquare, Crown, Sparkle } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -16,24 +16,49 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FFF0F5] min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto animate-fade-in select-none">
+    <div className="bg-[#FFF0F5] min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto animate-fade-in select-none">
       
-      {/* 1. Header Banner */}
-      <div className="text-center mb-16 space-y-3">
-        <span className="text-[11px] tracking-[0.3em] font-bold text-[#FF6FA7] uppercase flex items-center justify-center space-x-1.5">
+      {/* Royal Editorial Header with Upper & Lower Royal Ornamental Borders */}
+      <div className="relative text-center my-6 py-8 px-6 bg-gradient-to-r from-[#FFF8FA]/80 via-white to-[#FFF8FA]/80 rounded-3xl border border-[rgba(233,170,194,0.35)] luxury-card-shadow overflow-hidden max-w-4xl mx-auto mb-12">
+        
+        {/* Royal Upper Border Motif */}
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-24 sm:w-44" />
+          <div className="flex items-center space-x-1.5 text-[#FF6FA7]">
+            <span className="text-[10px]">♦</span>
+            <Crown className="w-4 h-4 text-[#FF6FA7]" />
+            <span className="text-[10px]">♦</span>
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-24 sm:w-44" />
+        </div>
+
+        {/* Subtitle */}
+        <span className="text-[11px] tracking-[0.3em] font-bold text-[#FF6FA7] uppercase flex items-center justify-center space-x-1.5 mb-2">
           <Sparkles className="w-3.5 h-3.5 text-[#FF6FA7]" />
           <span>LUXURY CONCIERGE SUPPORT</span>
         </span>
 
-        <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal text-[#1E1E1E] tracking-wider uppercase">
+        {/* Headline */}
+        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1E1E1E] tracking-wider uppercase mb-3">
           CONTACT OUR ATELIER
         </h1>
 
-        <div className="w-16 h-0.5 bg-[#FF6FA7] mx-auto rounded-full" />
-
-        <p className="text-xs sm:text-sm text-[#666666] font-light max-w-lg mx-auto leading-relaxed">
+        {/* Description */}
+        <p className="text-xs sm:text-sm text-[#666666] font-light max-w-lg mx-auto leading-relaxed mb-5">
           Our fine jewelry specialists are available 7 days a week for ring size consultations, custom orders, and order tracking.
         </p>
+
+        {/* Royal Lower Border Motif */}
+        <div className="flex items-center justify-center space-x-3 mt-1">
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-28 sm:w-52" />
+          <div className="flex items-center space-x-1.5 text-[#FF6FA7]">
+            <span className="text-[10px]">❖</span>
+            <Sparkle className="w-3.5 h-3.5 text-[#FF6FA7]" />
+            <span className="text-[10px]">❖</span>
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-28 sm:w-52" />
+        </div>
+
       </div>
 
       {/* 2. Grid Split: Contact Form (7 cols) + Atelier Info (5 cols) */}

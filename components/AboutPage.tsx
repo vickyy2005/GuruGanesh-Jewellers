@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Scale,
   Sparkle,
+  Crown,
 } from 'lucide-react';
 import { HERO_IMAGE, SUMMER_MODEL_IMAGE } from '../data';
 
@@ -18,24 +19,49 @@ interface AboutPageProps {
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onExploreShop }) => {
   return (
-    <div className="bg-[#FFF0F5] min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto animate-fade-in select-none space-y-16">
+    <div className="bg-[#FFF0F5] min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto animate-fade-in select-none space-y-16">
       
-      {/* 1. Minimalist Editorial Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4 pt-4">
-        <span className="text-[11px] tracking-[0.3em] font-bold text-[#FF6FA7] uppercase flex items-center justify-center space-x-1.5">
+      {/* Royal Editorial Header with Upper & Lower Royal Ornamental Borders */}
+      <div className="relative text-center my-6 py-8 px-6 bg-gradient-to-r from-[#FFF8FA]/80 via-white to-[#FFF8FA]/80 rounded-3xl border border-[rgba(233,170,194,0.35)] luxury-card-shadow overflow-hidden max-w-4xl mx-auto">
+        
+        {/* Royal Upper Border Motif */}
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-24 sm:w-44" />
+          <div className="flex items-center space-x-1.5 text-[#FF6FA7]">
+            <span className="text-[10px]">♦</span>
+            <Crown className="w-4 h-4 text-[#FF6FA7]" />
+            <span className="text-[10px]">♦</span>
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-24 sm:w-44" />
+        </div>
+
+        {/* Subtitle */}
+        <span className="text-[11px] tracking-[0.3em] font-bold text-[#FF6FA7] uppercase flex items-center justify-center space-x-1.5 mb-2">
           <Sparkles className="w-3.5 h-3.5 text-[#FF6FA7]" />
           <span>ESTABLISHED ATELIER • MUMBAI, INDIA</span>
         </span>
 
-        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1E1E1E] tracking-wider uppercase leading-tight">
+        {/* Headline */}
+        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1E1E1E] tracking-wider uppercase mb-3">
           THE HOUSE OF GURU GANESH
         </h1>
 
-        <div className="w-16 h-0.5 bg-[#FF6FA7] mx-auto rounded-full" />
-
-        <p className="text-xs sm:text-sm text-[#666666] font-light leading-relaxed max-w-xl mx-auto">
+        {/* Description */}
+        <p className="text-xs sm:text-sm text-[#666666] font-light leading-relaxed max-w-xl mx-auto mb-5">
           Crafting modern fine jewelry in heavy 18k Rose Gold Vermeil, designed for everyday elegance and timeless radiance.
         </p>
+
+        {/* Royal Lower Border Motif */}
+        <div className="flex items-center justify-center space-x-3 mt-1">
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-28 sm:w-52" />
+          <div className="flex items-center space-x-1.5 text-[#FF6FA7]">
+            <span className="text-[10px]">❖</span>
+            <Sparkle className="w-3.5 h-3.5 text-[#FF6FA7]" />
+            <span className="text-[10px]">❖</span>
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-[#FF6FA7] to-transparent w-28 sm:w-52" />
+        </div>
+
       </div>
 
       {/* 2. Stat Highlights Bar */}
