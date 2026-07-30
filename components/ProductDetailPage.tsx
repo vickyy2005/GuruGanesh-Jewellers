@@ -12,11 +12,13 @@ import {
   Sparkles,
   Check,
   ChevronRight,
+  ChevronLeft,
   Maximize2,
   X,
   ShoppingBag,
   ArrowLeft,
   ChevronDown,
+  ZoomIn,
 } from 'lucide-react';
 
 interface ProductDetailPageProps {
@@ -44,6 +46,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
   const [openAccordion, setOpenAccordion] = useState<'details' | 'shipping' | 'care' | null>('details');
 
+  // Cursor zoom state
+  const [zoomPos, setZoomPos] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false });
+
   // Scroll to top when product changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -55,6 +60,31 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }, [product]);
 
   const galleryImages = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentIndex = galleryImages.indexOf(selectedImage);
+    const nextIndex = (currentIndex + 1) % galleryImages.length;
+    setSelectedImage(galleryImages[nextIndex]);
+  };
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentIndex = galleryImages.indexOf(selectedImage);
+    const prevIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+    setSelectedImage(galleryImages[prevIndex]);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y, show: true });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomPos((prev) => ({ ...prev, show: false }));
+  };
 
   // Related products in the same category
   const relatedProducts = PRODUCTS.filter(
@@ -85,18 +115,58 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         
         {/* Left Column: Image Gallery (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="relative aspect-square w-full bg-[#FFF0F5]/50 rounded-2xl overflow-hidden group border border-[rgba(233,170,194,0.2)] shadow-xs">
+          
+          {/* Main Image Container with Cursor Magnifier Zoom & Slide Arrows */}
+          <div
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="relative aspect-square w-full bg-[#FFF0F5]/50 rounded-2xl overflow-hidden group border border-[rgba(233,170,194,0.25)] shadow-sm cursor-zoom-in"
+          >
             <img
               src={selectedImage}
               alt={product.name}
-              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+              className="w-full h-full object-cover object-center transition-transform duration-200 ease-out will-change-transform"
+              style={{
+                transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                transform: zoomPos.show ? 'scale(2.2)' : 'scale(1)',
+              }}
               referrerPolicy="no-referrer"
             />
 
-            {/* Expand Image Zoom */}
+            {/* Hover Zoom Hint */}
+            {!zoomPos.show && (
+              <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50 text-[10px] font-bold text-[#1E1E1E] flex items-center space-x-1 shadow-xs pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
+                <ZoomIn className="w-3.5 h-3.5 text-[#FF6FA7]" />
+                <span>Hover to Zoom Details</span>
+              </div>
+            )}
+
+            {/* Left Slide Arrow */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={handlePrevImage}
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 bg-white/85 hover:bg-white text-[#1E1E1E] hover:text-[#FF6FA7] rounded-full shadow-md transition-all duration-300 transform group-hover:scale-105"
+                title="Previous Image"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Right Slide Arrow */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={handleNextImage}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 bg-white/85 hover:bg-white text-[#1E1E1E] hover:text-[#FF6FA7] rounded-full shadow-md transition-all duration-300 transform group-hover:scale-105"
+                title="Next Image"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Expand Fullscreen Lightbox Button */}
             <button
               onClick={() => setIsLightboxOpen(true)}
-              className="absolute top-4 right-4 p-3 bg-white/80 backdrop-blur-md text-[#1E1E1E] hover:text-[#FF6FA7] rounded-full shadow-sm transition-all duration-300"
+              className="absolute top-4 right-4 p-3 bg-white/85 hover:bg-white text-[#1E1E1E] hover:text-[#FF6FA7] rounded-full shadow-md transition-all duration-300"
               title="Expand Image"
             >
               <Maximize2 className="w-4 h-4" />
@@ -105,7 +175,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Gallery Thumbnails Strip */}
           {galleryImages.length > 1 && (
-            <div className="flex space-x-3 overflow-x-auto pt-1">
+            <div className="flex space-x-3 overflow-x-auto pt-1 no-scrollbar">
               {galleryImages.map((imgUrl, idx) => {
                 const isSelected = selectedImage === imgUrl;
                 return (
@@ -114,7 +184,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     onClick={() => setSelectedImage(imgUrl)}
                     className={`relative w-18 h-18 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-300 ${
                       isSelected
-                        ? 'border-[#FF6FA7] opacity-100 shadow-xs'
+                        ? 'border-[#FF6FA7] opacity-100 shadow-xs scale-102'
                         : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                   >
@@ -375,14 +445,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
       {/* Lightbox Modal */}
       {isLightboxOpen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
           <button
             onClick={() => setIsLightboxOpen(false)}
-            className="absolute top-6 right-6 text-white p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+            className="absolute top-6 right-6 text-white p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-20"
           >
             <X className="w-6 h-6" />
           </button>
-          <img src={selectedImage} alt={product.name} className="max-w-full max-h-[90vh] object-contain rounded-2xl" />
+
+          {galleryImages.length > 1 && (
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-white p-3.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-20"
+              title="Previous Image"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {galleryImages.length > 1 && (
+            <button
+              onClick={handleNextImage}
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-white p-3.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-20"
+              title="Next Image"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          <img src={selectedImage} alt={product.name} className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl" />
         </div>
       )}
 
