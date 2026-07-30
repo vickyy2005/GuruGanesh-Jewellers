@@ -20,8 +20,6 @@ import {
   User,
   Palette,
   ChevronDown,
-  Sparkle,
-  Tag,
 } from 'lucide-react';
 
 interface ShopPageProps {
@@ -164,7 +162,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </p>
       </div>
 
-      {/* 1. Top Horizontal Categories Bar */}
+      {/* 1. Top Horizontal Categories Section */}
       <div className="mb-6">
         <div className="flex items-center space-x-2 overflow-x-auto pb-3 pt-1 no-scrollbar sm:justify-center">
           {categoriesWithCounts.map((cat) => {
@@ -194,14 +192,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       </div>
 
       {/* 2. Controls Bar (Results Count, Filter Toggle Button, Sort Selector) */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-4 border border-[rgba(233,170,194,0.25)] rounded-2xl luxury-card-shadow gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-4 border border-[rgba(233,170,194,0.25)] rounded-2xl luxury-card-shadow gap-4 mb-6">
         
         <div className="flex items-center justify-between sm:justify-start gap-4">
           <div className="text-xs font-semibold text-[#666666]">
             Showing <span className="text-[#FF6FA7] font-bold">{filtered.length}</span> luxury pieces
           </div>
 
-          {/* Unique FILTERS Button */}
+          {/* FILTERS Button - Clicking this toggles all filters */}
           <button
             onClick={() => setShowFiltersPanel(!showFiltersPanel)}
             className={`btn-pink-luxury text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center space-x-2 uppercase shadow-md transition-transform ${
@@ -235,66 +233,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
       </div>
 
-      {/* Active Filter Chips Bar */}
-      {activeFiltersCount > 0 && (
-        <div className="flex items-center flex-wrap gap-2 mb-6 bg-white/70 backdrop-blur-md p-3 rounded-2xl border border-[rgba(233,170,194,0.25)] text-xs">
-          <span className="text-[10px] font-bold text-[#999999] uppercase tracking-wider mr-1">ACTIVE FILTERS:</span>
-          {maxPrice < 20000 && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>Max ₹{maxPrice.toLocaleString('en-IN')}</span>
-              <button onClick={() => setMaxPrice(20000)} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          {selectedWeight !== 'ALL' && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>Weight: {selectedWeight}</span>
-              <button onClick={() => setSelectedWeight('ALL')} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          {selectedOccasion !== 'ALL' && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>Occasion: {selectedOccasion}</span>
-              <button onClick={() => setSelectedOccasion('ALL')} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          {selectedGender !== 'ALL' && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>Gender: {selectedGender}</span>
-              <button onClick={() => setSelectedGender('ALL')} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          {selectedStyle !== 'ALL' && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>Style: {selectedStyle}</span>
-              <button onClick={() => setSelectedStyle('ALL')} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          {inStockOnly && (
-            <span className="bg-[#FFF0F5] border border-[#FF6FA7]/30 text-[#FF6FA7] px-3 py-1 rounded-full font-bold text-[11px] flex items-center space-x-1">
-              <span>In-Stock Only</span>
-              <button onClick={() => setInStockOnly(false)} className="hover:text-[#1E1E1E]"><X className="w-3 h-3 ml-1" /></button>
-            </span>
-          )}
-          <button
-            onClick={resetFilters}
-            className="text-[10px] font-bold text-[#999999] hover:text-[#FF6FA7] underline uppercase ml-auto"
-          >
-            Clear All
-          </button>
-        </div>
-      )}
-
-      {/* 3. Unique Interactive Filter Panel (Expands when FILTERS button is clicked) */}
+      {/* 3. Expandable Filters Section (Visible ONLY after clicking FILTERS button) */}
       {showFiltersPanel && (
-        <div className="bg-gradient-to-r from-white via-[#FFF8FA] to-white p-6 sm:p-8 rounded-3xl border border-[rgba(233,170,194,0.4)] luxury-card-shadow mb-8 animate-fade-in space-y-8">
-          
+        <div className="bg-white p-6 rounded-2xl border border-[rgba(233,170,194,0.3)] luxury-card-shadow mb-8 animate-fade-in space-y-6">
           <div className="flex items-center justify-between border-b border-[#FDEEF3] pb-4">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-[#FF6FA7]" />
-              <h3 className="font-serif text-sm font-bold tracking-[0.2em] uppercase text-[#1E1E1E]">
-                ATELIER SELECTION STUDIO
-              </h3>
-            </div>
+            <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1E1E1E] flex items-center space-x-2">
+              <SlidersHorizontal className="w-4 h-4 text-[#FF6FA7]" />
+              <span>REFINE YOUR SELECTION</span>
+            </h3>
 
             <div className="flex items-center space-x-4">
               <button
@@ -307,25 +253,24 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <button
                 onClick={() => setShowFiltersPanel(false)}
                 className="p-1.5 text-[#999999] hover:text-[#FF6FA7] rounded-full hover:bg-[#FFF0F5] transition-colors"
-                title="Close Filters Studio"
+                title="Close Filters"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Interactive Filter Sections */}
-          <div className="space-y-6">
+          {/* Grid of All Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             
-            {/* Section A: PRICE RANGE & QUICK PRESETS */}
-            <div className="space-y-3 bg-white p-4.5 rounded-2xl border border-[rgba(233,170,194,0.2)]">
+            {/* Filter 1: Price Range */}
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center space-x-1.5">
-                  <Tag className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                  <span>1. PRICE RANGE</span>
+                <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase">
+                  MAX PRICE
                 </label>
                 <span className="text-xs font-bold text-[#FF6FA7]">
-                  Max: ₹{maxPrice.toLocaleString('en-IN')}
+                  ₹{maxPrice.toLocaleString('en-IN')}
                 </span>
               </div>
               <input
@@ -337,146 +282,85 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-full accent-[#FF6FA7] cursor-pointer"
               />
-              {/* Quick Price Preset Chips */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {[
-                  { label: 'Under ₹10,000', val: 10000 },
-                  { label: 'Under ₹15,000', val: 15000 },
-                  { label: 'All Price Ranges (₹20,000)', val: 20000 },
-                ].map((chip) => (
-                  <button
-                    key={chip.val}
-                    onClick={() => setMaxPrice(chip.val)}
-                    className={`text-[10px] font-bold px-3 py-1.5 rounded-full border transition-all ${
-                      maxPrice === chip.val
-                        ? 'bg-[#FF6FA7] text-white border-[#FF6FA7]'
-                        : 'bg-[#FFF0F5] text-[#666666] border-transparent hover:border-[#FF6FA7]/40'
-                    }`}
-                  >
-                    {chip.label}
-                  </button>
-                ))}
+              <div className="flex justify-between text-[10px] text-[#999999] font-bold">
+                <span>₹5,000</span>
+                <span>₹20,000</span>
               </div>
             </div>
 
-            {/* Section B: WEIGHT CHIPS */}
-            <div className="space-y-3 bg-white p-4.5 rounded-2xl border border-[rgba(233,170,194,0.2)]">
-              <label className="text-xs font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center space-x-1.5">
+            {/* Filter 2: Weight */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+                <span>WEIGHT</span>
                 <Scale className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                <span>2. JEWELRY WEIGHT</span>
               </label>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: 'All Weights', val: 'ALL' },
-                  { label: '🪶 Light (< 5g)', val: 'light' },
-                  { label: '⚖️ Medium (5g - 15g)', val: 'medium' },
-                  { label: '👑 Heavy Luxury (> 15g)', val: 'heavy' },
-                ].map((w) => (
-                  <button
-                    key={w.val}
-                    onClick={() => setSelectedWeight(w.val)}
-                    className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all ${
-                      selectedWeight === w.val
-                        ? 'bg-[#FF6FA7] text-white border-[#FF6FA7] shadow-xs'
-                        : 'bg-[#FFF0F5] text-[#666666] border-transparent hover:bg-white hover:border-[#FF6FA7]/40'
-                    }`}
-                  >
-                    {w.label}
-                  </button>
-                ))}
-              </div>
+              <select
+                value={selectedWeight}
+                onChange={(e) => setSelectedWeight(e.target.value)}
+                className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+              >
+                <option value="ALL">All Weights</option>
+                <option value="light">Light Weight (&lt; 5g)</option>
+                <option value="medium">Medium Weight (5g - 15g)</option>
+                <option value="heavy">Heavy Luxury (&gt; 15g)</option>
+              </select>
             </div>
 
-            {/* Section C: OCCASIONS VISUAL CHIPS */}
-            <div className="space-y-3 bg-white p-4.5 rounded-2xl border border-[rgba(233,170,194,0.2)]">
-              <label className="text-xs font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center space-x-1.5">
+            {/* Filter 3: Occasion (Sub-categories) */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+                <span>OCCASION</span>
                 <Gift className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                <span>3. OCCASION &amp; EVENT</span>
               </label>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: 'All Occasions', val: 'ALL' },
-                  { label: '👰 Bridal & Wedding', val: 'bridal' },
-                  { label: '💼 Daily Workwear', val: 'daily' },
-                  { label: '✨ Parties & Gala', val: 'party' },
-                  { label: '🪔 Festive & Puja', val: 'festive' },
-                  { label: '🎁 Anniversary Gift', val: 'anniversary' },
-                ].map((occ) => (
-                  <button
-                    key={occ.val}
-                    onClick={() => setSelectedOccasion(occ.val)}
-                    className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all ${
-                      selectedOccasion === occ.val
-                        ? 'bg-[#FF6FA7] text-white border-[#FF6FA7] shadow-xs'
-                        : 'bg-[#FFF0F5] text-[#666666] border-transparent hover:bg-white hover:border-[#FF6FA7]/40'
-                    }`}
-                  >
-                    {occ.label}
-                  </button>
-                ))}
-              </div>
+              <select
+                value={selectedOccasion}
+                onChange={(e) => setSelectedOccasion(e.target.value)}
+                className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+              >
+                <option value="ALL">All Occasions</option>
+                <option value="bridal">👰 Bridal &amp; Wedding</option>
+                <option value="daily">💼 Daily Workwear</option>
+                <option value="party">✨ Parties &amp; Gala</option>
+                <option value="festive">🪔 Festive &amp; Puja</option>
+                <option value="anniversary">🎁 Anniversary Gift</option>
+              </select>
             </div>
 
-            {/* Section D: GENDER & STYLE ROW */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* Gender Pills */}
-              <div className="space-y-3 bg-white p-4.5 rounded-2xl border border-[rgba(233,170,194,0.2)]">
-                <label className="text-xs font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center space-x-1.5">
-                  <User className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                  <span>4. GENDER</span>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: 'All', val: 'ALL' },
-                    { label: 'Women', val: 'Women' },
-                    { label: 'Men', val: 'Men' },
-                    { label: 'Unisex', val: 'Unisex' },
-                  ].map((g) => (
-                    <button
-                      key={g.val}
-                      onClick={() => setSelectedGender(g.val)}
-                      className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all ${
-                        selectedGender === g.val
-                          ? 'bg-[#FF6FA7] text-white border-[#FF6FA7]'
-                          : 'bg-[#FFF0F5] text-[#666666] border-transparent hover:border-[#FF6FA7]/40'
-                      }`}
-                    >
-                      {g.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Filter 4: Gender */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+                <span>GENDER</span>
+                <User className="w-3.5 h-3.5 text-[#FF6FA7]" />
+              </label>
+              <select
+                value={selectedGender}
+                onChange={(e) => setSelectedGender(e.target.value)}
+                className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+              >
+                <option value="ALL">All Genders</option>
+                <option value="Women">Women's Collection</option>
+                <option value="Men">Men's Collection</option>
+                <option value="Unisex">Unisex / Neutral</option>
+              </select>
+            </div>
 
-              {/* Style Pills */}
-              <div className="space-y-3 bg-white p-4.5 rounded-2xl border border-[rgba(233,170,194,0.2)]">
-                <label className="text-xs font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center space-x-1.5">
-                  <Palette className="w-3.5 h-3.5 text-[#FF6FA7]" />
-                  <span>5. STYLE &amp; DESIGN</span>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: 'All Styles', val: 'ALL' },
-                    { label: 'Solitaire & Halo', val: 'solitaire' },
-                    { label: 'Minimalist', val: 'minimalist' },
-                    { label: 'Statement', val: 'statement' },
-                    { label: 'Vintage', val: 'vintage' },
-                  ].map((st) => (
-                    <button
-                      key={st.val}
-                      onClick={() => setSelectedStyle(st.val)}
-                      className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all ${
-                        selectedStyle === st.val
-                          ? 'bg-[#FF6FA7] text-white border-[#FF6FA7]'
-                          : 'bg-[#FFF0F5] text-[#666666] border-transparent hover:border-[#FF6FA7]/40'
-                      }`}
-                    >
-                      {st.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
+            {/* Filter 5: Style */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold tracking-wider text-[#1E1E1E] uppercase flex items-center justify-between">
+                <span>STYLE</span>
+                <Palette className="w-3.5 h-3.5 text-[#FF6FA7]" />
+              </label>
+              <select
+                value={selectedStyle}
+                onChange={(e) => setSelectedStyle(e.target.value)}
+                className="w-full bg-[#FFF0F5] border border-[rgba(233,170,194,0.3)] rounded-xl p-2.5 text-xs font-bold text-[#1E1E1E] focus:outline-none focus:border-[#FF6FA7]"
+              >
+                <option value="ALL">All Styles</option>
+                <option value="solitaire">Solitaire &amp; Halo</option>
+                <option value="minimalist">Minimalist Elegant</option>
+                <option value="statement">Statement &amp; Choker</option>
+                <option value="vintage">Vintage Heirloom</option>
+              </select>
             </div>
 
           </div>
@@ -495,7 +379,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             <button
               onClick={() => setShowFiltersPanel(false)}
-              className="btn-pink-luxury text-white text-xs font-bold px-8 py-3 rounded-full uppercase shadow-md hover:scale-102 transition-transform"
+              className="btn-pink-luxury text-white text-xs font-bold px-6 py-2 rounded-xl uppercase shadow-xs"
             >
               APPLY FILTERS
             </button>
