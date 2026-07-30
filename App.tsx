@@ -303,12 +303,14 @@ export default function App() {
         onOpenModal={(title, content) => setInfoModalData({ title, content })}
       />
 
-      {/* Floating Jewelry Stylist Assistant Chat Widget */}
-      <StylistChatWidget
-        onSelectProduct={handleSelectProduct}
-        onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
-        onOpenStackBuilder={() => setIsStackBuilderOpen(true)}
-      />
+      {/* Floating Jewelry Stylist Assistant Chat Widget (Visible ONLY after preloader finishes) */}
+      {!isLoading && (
+        <StylistChatWidget
+          onSelectProduct={handleSelectProduct}
+          onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
+          onOpenStackBuilder={() => setIsStackBuilderOpen(true)}
+        />
+      )}
 
       {/* Interactive Drawers & Modals */}
       <CartDrawer
