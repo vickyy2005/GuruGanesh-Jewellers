@@ -46,9 +46,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
   const [openAccordion, setOpenAccordion] = useState<'details' | 'shipping' | 'care' | null>('details');
 
-  // Cursor zoom state
+  // Cursor zoom state & hover slideshow state
   const [zoomPos, setZoomPos] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false });
   const [isZoomActive, setIsZoomActive] = useState<boolean>(false);
+  const [isHoveringMainImage, setIsHoveringMainImage] = useState<boolean>(false);
 
   // Scroll to top when product changes
   useEffect(() => {
@@ -66,6 +67,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }, [selectedImage]);
 
   const galleryImages = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+
+  // Auto-slide images when mouse cursor hovers over main image
+  useEffect(() => {
+    if (isHoveringMainImage && !isZoomActive && galleryImages.length > 1) {
+      const interval = setInterval(() => {
+        setSelectedImage((current) => {
+          const currentIdx = galleryImages.indexOf(current);
+          const nextIdx = (currentIdx + 1) % galleryImages.length;
+          return galleryImages[nextIdx];
+        });
+      }, 1300);
+      return () => clearInterval(interval);
+    }
+  }, [isHoveringMainImage, isZoomActive, galleryImages]);
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -126,8 +141,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* Main Image Container with Click-to-Activate Magnifier Zoom & Slide Arrows */}
           <div
             onClick={() => setIsZoomActive(!isZoomActive)}
+            onMouseEnter={() => setIsHoveringMainImage(true)}
             onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={() => {
+              setIsHoveringMainImage(false);
+              handleMouseLeave();
+            }}
             className={`relative aspect-square w-full bg-[#FFF0F5]/50 rounded-2xl overflow-hidden group border transition-all duration-300 ${
               isZoomActive
                 ? 'border-[#FF6FA7] shadow-lg cursor-zoom-out'

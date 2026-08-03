@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PRODUCTS, BLOG_POSTS } from './data';
 import { Product, CartItem, BlogPost, ToastMessage } from './types';
 import { Header } from './components/Header';
@@ -13,7 +13,6 @@ import { BlogReaderModal } from './components/BlogReaderModal';
 import { SearchModal } from './components/SearchModal';
 import { InfoModal } from './components/InfoModal';
 import { Toast } from './components/Toast';
-import { CustomCursor } from './components/CustomCursor';
 import { ProductDetailPage } from './components/ProductDetailPage';
 import { ShopPage } from './components/ShopPage';
 import { AboutPage } from './components/AboutPage';
@@ -26,13 +25,53 @@ import { FaqSection } from './components/FaqSection';
 import { LuxuryPreloader } from './components/LuxuryPreloader';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
-import { ScrollFadeSection } from './components/ScrollFadeSection';
+import { AdminPage } from './components/AdminPage';
+import { AdminLoginModal } from './components/AdminLoginModal';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeView, setActiveView] = useState<'home' | 'shop' | 'product-detail' | 'about' | 'contact'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'shop' | 'product-detail' | 'about' | 'contact' | 'admin'>('home');
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Dynamic Products State with LocalStorage Persistence & Strict Category Images Sync
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const saved = localStorage.getItem('glow_co_products');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const defaultMap = new Map(PRODUCTS.map((p) => [p.id, p]));
+          const existingIds = new Set(parsed.map((p: Product) => p.id));
+          const updatedParsed = parsed.map((p: Product) => {
+            const def = defaultMap.get(p.id);
+            if (def) {
+              return { ...p, image: def.image, gallery: def.gallery };
+            }
+            return p;
+          });
+          const missingDefaults = PRODUCTS.filter((p) => !existingIds.has(p.id));
+          return [...updatedParsed, ...missingDefaults];
+        }
+      }
+    } catch (err) {
+      console.error('Failed to parse localStorage products:', err);
+    }
+    return PRODUCTS;
+  });
+
+  // Save to localStorage when products update
+  useEffect(() => {
+    try {
+      localStorage.setItem('glow_co_products', JSON.stringify(products));
+    } catch (err) {
+      console.error('Failed to save products to localStorage:', err);
+    }
+  }, [products]);
+
+  // Admin Auth & Modal State
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlistIds, setWishlistIds] = useState<string[]>(['prod-1', 'prod-3']);
@@ -90,11 +129,11 @@ export default function App() {
   };
 
   // Add multiple items from stack builder
-  const handleAddStackToCart = (products: Product[]) => {
-    products.forEach((p) => {
+  const handleAddStackToCart = (productsToAdd: Product[]) => {
+    productsToAdd.forEach((p) => {
       handleAddToCart(p, 1);
     });
-    showToast('Custom Stack Added! ✨', `${products.length} luxury pieces added to your shopping bag.`);
+    showToast('Custom Stack Added! ✨', `${productsToAdd.length} luxury pieces added to your shopping bag.`);
   };
 
   // Update item quantity in bag
@@ -132,7 +171,60 @@ export default function App() {
     });
   };
 
-  const wishlistProducts = PRODUCTS.filter((p) => wishlistIds.includes(p.id));
+  const wishlistProducts = products.filter((p) => wishlistIds.includes(p.id));
+
+  // Admin CRUD Handlers
+  const handleAddProduct = (newProduct: Product) => {
+    setProducts((prev) => [newProduct, ...prev]);
+    showToast('Product Added! ✨', `"${newProduct.name}" added to catalog.`);
+  };
+
+  const handleUpdateProduct = (updatedProduct: Product) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+    );
+    if (selectedProduct?.id === updatedProduct.id) {
+      setSelectedProduct(updatedProduct);
+    }
+    showToast('Product Updated 💎', `"${updatedProduct.name}" updated successfully.`);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    const target = products.find((p) => p.id === productId);
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+    if (selectedProduct?.id === productId) {
+      setSelectedProduct(null);
+      setActiveView('shop');
+    }
+    showToast('Product Deleted', `"${target?.name || 'Item'}" removed from store.`);
+  };
+
+  const handleResetProducts = () => {
+    setProducts(PRODUCTS);
+    try {
+      localStorage.removeItem('glow_co_products');
+    } catch (err) {
+      console.error(err);
+    }
+    showToast('Catalog Restored 🔄', 'Default products set restored.');
+  };
+
+  const handleOpenAdmin = () => {
+    if (isAdminAuthenticated) {
+      setActiveView('admin');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setIsAdminLoginOpen(true);
+    }
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminAuthenticated(true);
+    setIsAdminLoginOpen(false);
+    setActiveView('admin');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Welcome Admin 👑', 'Access granted to Product Concierge Panel.');
+  };
 
   // Handle Checkout simulation
   const handleCheckout = () => {
@@ -161,7 +253,7 @@ export default function App() {
   };
 
   // Filter products for homepage section
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const filteredProducts = products.filter((p) => {
     if (activeCategory === 'ALL') return true;
     if (activeCategory === 'NEW') return p.isNew || p.isBestseller;
     if (activeCategory === 'SALE') return p.isSale || (p.originalPrice && p.originalPrice > p.price);
@@ -175,9 +267,6 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-[#FFF0F5] text-[#1E1E1E] selection:bg-[#E89AB5] selection:text-white">
       {/* Initial Website Preloader Screen */}
       {isLoading && <LuxuryPreloader onComplete={() => setIsLoading(false)} />}
-
-      {/* Custom Pink Magnetic Follower Cursor */}
-      <CustomCursor />
 
       {/* Floating Glassmorphism Header */}
       <Header
@@ -195,6 +284,7 @@ export default function App() {
         }}
         onOpenStackBuilder={() => setIsStackBuilderOpen(true)}
         onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
         onOpenAbout={() =>
           setInfoModalData({
             title: 'ABOUT GLOW & CO.',
@@ -213,7 +303,20 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {activeView === 'product-detail' && selectedProduct ? (
+        {activeView === 'admin' ? (
+          <AdminPage
+            products={products}
+            onAddProduct={handleAddProduct}
+            onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
+            onResetProducts={handleResetProducts}
+            onBackToShop={() => {
+              setActiveView('shop');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectProduct={handleSelectProduct}
+          />
+        ) : activeView === 'product-detail' && selectedProduct ? (
           <ProductDetailPage
             product={selectedProduct}
             onAddToCart={handleAddToCart}
@@ -223,6 +326,7 @@ export default function App() {
           />
         ) : activeView === 'shop' ? (
           <ShopPage
+            products={products}
             onSelectProduct={handleSelectProduct}
             onAddToCart={(p) => handleAddToCart(p, 1)}
             selectedCategory={activeCategory}
@@ -282,7 +386,10 @@ export default function App() {
             />
 
             {/* 5. Customer Instagram Showcase */}
-            <CustomerShowcaseSection onSelectProduct={handleSelectProduct} />
+            <CustomerShowcaseSection
+              products={products}
+              onSelectProduct={handleSelectProduct}
+            />
 
             {/* 6. Style & Craftsmanship Journal */}
             <BlogSection onReadPost={(post) => setReadingPost(post)} />
@@ -301,6 +408,7 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenModal={(title, content) => setInfoModalData({ title, content })}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* Floating Jewelry Stylist Assistant Chat Widget (Visible ONLY after preloader finishes) */}
@@ -346,6 +454,7 @@ export default function App() {
         onClose={() => setIsStackBuilderOpen(false)}
         onAddStackToCart={handleAddStackToCart}
         onSelectProduct={handleSelectProduct}
+        products={products}
       />
 
       {/* Ring & Wrist Size Guide Finder Modal */}
@@ -365,6 +474,7 @@ export default function App() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onSelectProduct={handleSelectProduct}
+        products={products}
       />
 
       {/* Info / Policy Modal */}
@@ -374,9 +484,15 @@ export default function App() {
         onClose={() => setInfoModalData(null)}
       />
 
+      {/* Admin Login Modal */}
+      <AdminLoginModal
+        isOpen={isAdminLoginOpen}
+        onClose={() => setIsAdminLoginOpen(false)}
+        onSuccess={handleAdminLoginSuccess}
+      />
+
       {/* Toast Notification */}
       <Toast toast={toast} onClose={() => setToast(null)} />
-
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Sparkles, Crown, Gem } from 'lucide-react';
+import { GuruGaneshLogo } from './GuruGaneshLogo';
 
 interface LuxuryPreloaderProps {
   onComplete: () => void;
@@ -58,11 +59,11 @@ export const LuxuryPreloader: React.FC<LuxuryPreloaderProps> = ({ onComplete }) 
       <div className="relative z-10 flex flex-col items-center text-center space-y-8 max-w-lg px-6">
         
         {/* Pulsing Gemstone Icon with Orbiting Rings */}
-        <div className="relative flex items-center justify-center w-24 h-24">
+        <div className="relative flex items-center justify-center w-28 h-28">
           <div className="absolute inset-0 rounded-full border border-[#FF6FA7]/30 animate-[spin_10s_linear_infinite]" />
           <div className="absolute inset-2 rounded-full border border-dashed border-[#E89AB5]/50 animate-[spin_15s_linear_infinite_reverse]" />
           <div className="p-4 bg-white rounded-full border border-[rgba(233,170,194,0.4)] luxury-card-shadow transform transition-transform duration-500 scale-110">
-            <Gem className="w-8 h-8 text-[#FF6FA7] animate-pulse" />
+            <GuruGaneshLogo size={56} showText={false} />
           </div>
         </div>
 

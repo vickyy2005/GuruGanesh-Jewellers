@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { PRODUCTS } from '../data';
+import { HoverImageSlider } from './HoverImageSlider';
 import {
   Star,
   Eye,
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 
 interface ShopPageProps {
+  products?: Product[];
   onSelectProduct: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   selectedCategory: string;
@@ -31,11 +33,13 @@ interface ShopPageProps {
 }
 
 export const ShopPage: React.FC<ShopPageProps> = ({
+  products,
   onSelectProduct,
   onAddToCart,
   selectedCategory,
   onCategoryChange,
 }) => {
+  const productList = products || PRODUCTS;
   const [maxPrice, setMaxPrice] = useState<number>(20000);
   const [selectedWeight, setSelectedWeight] = useState<string>('ALL');
   const [selectedOccasion, setSelectedOccasion] = useState<string>('ALL');
@@ -54,7 +58,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   };
 
   // Filter logic
-  let filtered = PRODUCTS.filter((p) => {
+  let filtered = productList.filter((p) => {
     if (selectedCategory !== 'ALL') {
       if (selectedCategory === 'NEW' && !p.isNew && !p.isBestseller) return false;
       if (selectedCategory === 'SALE' && !p.isSale && (!p.originalPrice || p.originalPrice <= p.price)) return false;
@@ -423,16 +427,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               onClick={() => onSelectProduct(product)}
               className="group bg-white rounded-2xl border border-[rgba(233,170,194,0.25)] overflow-hidden luxury-card-shadow hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
             >
-              <div className="relative aspect-square overflow-hidden bg-[#FDEEF3]">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  referrerPolicy="no-referrer"
+              <div className="relative aspect-square overflow-hidden bg-[#FDEEF3] mb-0">
+                <HoverImageSlider
+                  product={product}
+                  onClick={() => onSelectProduct(product)}
+                  aspectRatioClass="h-full mb-0"
                 />
                 
                 {/* Badges */}
-                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                <div className="absolute top-3 left-3 z-30 flex flex-col gap-1.5 pointer-events-none">
                   {product.isBestseller && (
                     <span className="bg-[#FF6FA7] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-xs">
                       BESTSELLER
@@ -448,7 +451,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 {/* Wishlist Heart Button */}
                 <button
                   onClick={(e) => toggleWishlist(e, product.id)}
-                  className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-md rounded-full text-[#FF6FA7] hover:bg-white hover:scale-110 transition-all shadow-xs"
+                  className="absolute top-3 right-3 z-30 p-2 bg-white/80 backdrop-blur-md rounded-full text-[#FF6FA7] hover:bg-white hover:scale-110 transition-all shadow-xs"
                 >
                   <Heart
                     className={`w-4 h-4 ${

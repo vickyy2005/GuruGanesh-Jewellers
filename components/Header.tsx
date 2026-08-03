@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingBag, Heart, Menu, X, Sparkles, Layers, Ruler, ShieldCheck } from 'lucide-react';
+import { GuruGaneshLogo } from './GuruGaneshLogo';
 
 interface HeaderProps {
   cartCount: number;
@@ -9,12 +10,13 @@ interface HeaderProps {
   onOpenSearch: () => void;
   onSelectCategory: (cat: string) => void;
   activeCategory: string;
-  activeView: 'home' | 'shop' | 'product-detail' | 'about' | 'contact';
-  onNavigate: (view: 'home' | 'shop' | 'about' | 'contact') => void;
+  activeView: 'home' | 'shop' | 'product-detail' | 'about' | 'contact' | 'admin';
+  onNavigate: (view: 'home' | 'shop' | 'about' | 'contact' | 'admin') => void;
   onOpenStackBuilder?: () => void;
   onOpenSizeGuide?: () => void;
   onOpenAbout?: () => void;
   onOpenContact?: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSizeGuide,
   onOpenAbout,
   onOpenContact,
+  onOpenAdmin,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -76,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Top Right Utility Buttons: Size Finder & Stack Builder */}
+          {/* Top Right Utility Buttons: Size Finder, Stack Builder & Admin Panel */}
           <div className="hidden sm:flex items-center space-x-5 font-bold tracking-[0.2em] uppercase text-[#E89AB5]">
             {onOpenSizeGuide && (
               <button
@@ -100,6 +103,20 @@ export const Header: React.FC<HeaderProps> = ({
                 <Layers className="w-3.5 h-3.5 text-[#FF6FA7]" />
                 <span>STACK BUILDER</span>
               </button>
+            )}
+
+            {onOpenAdmin && (
+              <>
+                <div className="w-px h-3 bg-white/20" />
+                <button
+                  onClick={onOpenAdmin}
+                  className="hover:text-white transition-colors flex items-center space-x-1.5 cursor-pointer text-[#FF6FA7]"
+                  title="Admin Panel - Product Concierge"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#FF6FA7]" />
+                  <span>ADMIN PANEL</span>
+                </button>
+              </>
             )}
           </div>
 
@@ -130,13 +147,10 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Logo */}
             <div
-              className="flex-shrink-0 flex items-center cursor-pointer group space-x-2"
+              className="flex-shrink-0 flex items-center cursor-pointer"
               onClick={() => handleNavClick({ label: 'HOME', view: 'home', value: 'ALL' })}
             >
-              <Sparkles className="w-5 h-5 text-[#E89AB5] group-hover:rotate-12 transition-transform duration-500" />
-              <span className="font-serif text-2xl sm:text-3xl tracking-[0.22em] font-normal text-[#1E1E1E] uppercase group-hover:text-[#FF6FA7] transition-colors duration-300">
-                GURU GANESH
-              </span>
+              <GuruGaneshLogo size={42} />
             </div>
 
             {/* Center Navigation Links (Clean & Spacious) */}
@@ -242,6 +256,19 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Ruler className="w-4 h-4 text-[#C98A9F]" />
                 <span>RING SIZE FINDER</span>
+              </button>
+            )}
+
+            {onOpenAdmin && (
+              <button
+                onClick={() => {
+                  onOpenAdmin();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center space-x-2 py-3 bg-gradient-to-r from-[#B85B7A] to-[#E89AB5] text-white font-bold text-xs tracking-widest uppercase rounded-full shadow-md"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>ADMIN PANEL</span>
               </button>
             )}
           </div>

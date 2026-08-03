@@ -8,6 +8,7 @@ interface StackBuilderModalProps {
   onClose: () => void;
   onAddStackToCart: (products: Product[]) => void;
   onSelectProduct: (product: Product) => void;
+  products?: Product[];
 }
 
 export const StackBuilderModal: React.FC<StackBuilderModalProps> = ({
@@ -15,13 +16,16 @@ export const StackBuilderModal: React.FC<StackBuilderModalProps> = ({
   onClose,
   onAddStackToCart,
   onSelectProduct,
+  products,
 }) => {
   const [selectedStack, setSelectedStack] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<'Rings' | 'Necklaces' | 'Bracelets'>('Rings');
 
   if (!isOpen) return null;
 
-  const categoryProducts = PRODUCTS.filter(
+  const productList = products || PRODUCTS;
+
+  const categoryProducts = productList.filter(
     (p) => p.category.toLowerCase() === activeCategory.toLowerCase()
   );
 

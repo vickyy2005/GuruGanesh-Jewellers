@@ -5,10 +5,12 @@ import { Product } from '../types';
 
 interface CustomerShowcaseSectionProps {
   onSelectProduct: (product: Product) => void;
+  products?: Product[];
 }
 
-export const CustomerShowcaseSection: React.FC<CustomerShowcaseSectionProps> = ({ onSelectProduct }) => {
+export const CustomerShowcaseSection: React.FC<CustomerShowcaseSectionProps> = ({ onSelectProduct, products }) => {
   const [likedPosts, setLikedPosts] = useState<Record<number, boolean>>({});
+  const productList = products || PRODUCTS;
 
   const toggleLike = (id: number) => {
     setLikedPosts((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -73,7 +75,7 @@ export const CustomerShowcaseSection: React.FC<CustomerShowcaseSectionProps> = (
       {/* Showcase Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {showcasePosts.map((post) => {
-          const product = PRODUCTS.find((p) => p.id === post.productId) || PRODUCTS[0];
+          const product = productList.find((p) => p.id === post.productId) || productList[0];
           const isLiked = likedPosts[post.id];
 
           return (

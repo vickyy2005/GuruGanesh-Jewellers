@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { HERO_IMAGE } from '../data';
 import { ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 
 interface HeroProps {
@@ -7,7 +6,17 @@ interface HeroProps {
   onOpenStackBuilder?: () => void;
 }
 
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1630019852942-f89202989a59?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?q=80&w=1600&auto=format&fit=crop',
+];
+
 export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
@@ -16,7 +25,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
     setIsLoaded(true);
 
     const handleScroll = () => {
-      if (window.scrollY < 900) {
+      if (window.window && window.scrollY < 900) {
         setScrollY(window.scrollY);
       }
     };
@@ -38,9 +47,16 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
     };
   }, []);
 
-  const headline = "ELEVATE EVERY MOMENT.";
-  const letters = headline.split("");
+  // Automatic background image rotation (every 4 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 4000);
 
+    return () => clearInterval(interval);
+  }, []);
+
+  const headline = "ELEVATE EVERY MOMENT.";
   const words = [
     { word: "ELEVATE", chars: "ELEVATE".split("") },
     { word: "EVERY", chars: "EVERY".split("") },
@@ -50,31 +66,46 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
   let charGlobalCounter = 0;
 
   return (
-    <section className="relative w-full min-h-[480px] sm:min-h-[540px] lg:min-h-[600px] flex items-center justify-start overflow-hidden bg-[#FFF8FA] border-b border-[rgba(233,170,194,0.2)] select-none">
+    <section className="relative w-full min-h-[500px] sm:min-h-[580px] lg:min-h-[640px] flex items-center justify-start overflow-hidden bg-[#FFF8FA] border-b border-[rgba(233,170,194,0.2)] select-none">
       
-      {/* 1. Full-Width Background Image with Ken Burns & Mouse Parallax */}
+      {/* 1. Auto-Changing Background Images (Smooth Fade & Zoom Transition) */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <img
-          src={HERO_IMAGE}
-          alt="GLOW & CO. Luxury Rose Gold Fine Jewelry"
-          className={`w-full h-full object-cover object-[65%_center] sm:object-center transition-all duration-1000 ease-out will-change-transform ${
-            isLoaded ? 'opacity-100 animate-[heroBgZoom_3.5s_cubic-bezier(0.16,1,0.3,1)_forwards]' : 'opacity-0 scale-106'
-          }`}
-          style={{
-            transform: `translate3d(${mousePos.x * 0.4}px, ${scrollY * 0.18 + mousePos.y * 0.4}px, 0) scale(${1 + (900 - scrollY) * 0.00004})`,
-            transition: 'transform 0.15s ease-out, opacity 1.2s ease-out',
-          }}
-          referrerPolicy="no-referrer"
-        />
+        {HERO_IMAGES.map((imgUrl, idx) => {
+          const isActive = idx === currentImageIndex;
+          return (
+            <div
+              key={imgUrl}
+              className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+                isActive
+                  ? 'opacity-100 scale-100 z-10'
+                  : 'opacity-0 scale-105 pointer-events-none z-0'
+              }`}
+            >
+              <img
+                src={imgUrl}
+                alt="GLOW & CO. Luxury Fine Jewelry"
+                className="w-full h-full object-cover object-[65%_center] sm:object-center transition-transform duration-1000 ease-out"
+                style={{
+                  transform: isActive
+                    ? `translate3d(${mousePos.x * 0.4}px, ${scrollY * 0.18 + mousePos.y * 0.4}px, 0) scale(${
+                        1.03 + (900 - scrollY) * 0.00004
+                      })`
+                    : 'scale(1.08)',
+                }}
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          );
+        })}
 
         {/* 2. Floating Pink Particle Lights */}
-        <div className="floating-particle w-48 h-48 top-12 left-1/4 pointer-events-none" style={{ animationDelay: '0s' }} />
-        <div className="floating-particle w-64 h-64 bottom-20 left-10 pointer-events-none" style={{ animationDelay: '2s' }} />
-        <div className="floating-particle w-40 h-40 top-1/3 right-1/4 pointer-events-none" style={{ animationDelay: '4s' }} />
+        <div className="floating-particle w-48 h-48 top-12 left-1/4 pointer-events-none z-15" style={{ animationDelay: '0s' }} />
+        <div className="floating-particle w-64 h-64 bottom-20 left-10 pointer-events-none z-15" style={{ animationDelay: '2s' }} />
+        <div className="floating-particle w-40 h-40 top-1/3 right-1/4 pointer-events-none z-15" style={{ animationDelay: '4s' }} />
 
         {/* 3. Soft Warm Pink Gradient Overlay for Pristine Readability */}
         <div
-          className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+          className="absolute inset-0 pointer-events-none z-15 transition-opacity duration-300"
           style={{
             background: `linear-gradient(90deg, 
               rgba(255, 248, 250, 0.97) 0%, 
@@ -86,11 +117,11 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
         />
 
         {/* Soft Ambient Rose Gold Glow */}
-        <div className="absolute top-1/3 left-10 w-96 h-96 bg-[#FDEEF3]/60 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-10 w-96 h-96 bg-[#FDEEF3]/60 rounded-full blur-3xl pointer-events-none z-15" />
       </div>
 
-      {/* 4. Luxury Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full py-14 sm:py-20 lg:py-24">
+      {/* 4. Constant Luxury Content Container (Text Keeps Same) */}
+      <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full py-14 sm:py-20 lg:py-24">
         <div className="max-w-xl lg:max-w-3xl">
           
           {/* Subtitle Badge */}
@@ -104,7 +135,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
             <span>SWAROVSKI &amp; ROSE GOLD FINE JEWELRY</span>
           </div>
 
-          {/* Single-Line Fluid Headline with Intact Words */}
+          {/* Headline (Remains Constant "ELEVATE EVERY MOMENT.") */}
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-normal text-[#1E1E1E] tracking-tight leading-[1.08] uppercase mb-6 flex flex-wrap gap-x-3 sm:gap-x-4 whitespace-nowrap">
             {words.map((wObj, wIdx) => (
               <span key={wIdx} className="inline-block whitespace-nowrap">
@@ -129,21 +160,22 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
             ))}
           </h1>
 
-          {/* Description Animation */}
+          {/* Description (Remains Constant) */}
           <p
             className="text-[#666666] text-base sm:text-lg lg:text-xl font-sans font-light tracking-wide leading-relaxed mb-10 max-w-lg"
             style={{
-              animation: isLoaded ? `heroDescReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${200 + letters.length * 40 + 200}ms forwards` : 'none',
+              animation: isLoaded ? `heroDescReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${200 + headline.length * 40 + 200}ms forwards` : 'none',
               opacity: isLoaded ? undefined : 0,
             }}
           >
             Timeless 18k Rose Gold Vermeil &amp; sparkling gem creations designed to embrace your inner romantic.
           </p>
 
-          {/* Luxury Pink CTA Button */}
+          {/* Luxury Pink CTA Buttons */}
           <div
+            className="flex flex-wrap items-center gap-4"
             style={{
-              animation: isLoaded ? `heroCtaReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) ${200 + letters.length * 40 + 400}ms forwards` : 'none',
+              animation: isLoaded ? `heroCtaReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) ${200 + headline.length * 40 + 400}ms forwards` : 'none',
               opacity: isLoaded ? undefined : 0,
             }}
           >
@@ -154,20 +186,60 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onOpenStackBuilder }) => 
               <span>DISCOVER BOUTIQUE</span>
               <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
             </button>
+
+            {onOpenStackBuilder && (
+              <button
+                onClick={onOpenStackBuilder}
+                className="bg-white/80 hover:bg-white text-[#B85B7A] border border-[#E89AB5] text-[12px] sm:text-[13px] font-bold tracking-[0.2em] uppercase px-7 py-4 rounded-full shadow-sm hover:shadow transition-all"
+              >
+                BUILD CUSTOM STACK
+              </button>
+            )}
           </div>
 
         </div>
       </div>
 
-      {/* Continuous Bouncing Scroll Indicator */}
+      {/* 5. Minimal Image Indicator Dots (Displays Active Image) */}
+      <div className="absolute bottom-6 right-8 sm:right-16 z-30 flex items-center space-x-2">
+        {HERO_IMAGES.map((_, idx) => (
+          <div
+            key={idx}
+            className={`h-2 rounded-full transition-all duration-500 ${
+              idx === currentImageIndex
+                ? 'w-7 bg-[#B85B7A]'
+                : 'w-2 bg-[#E89AB5]/40'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* 6. Subtle Continuous Auto-Slide Progress Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-neutral-200/30 z-30 overflow-hidden">
+        <div
+          key={currentImageIndex}
+          className="h-full bg-gradient-to-r from-[#B85B7A] to-[#E89AB5]"
+          style={{
+            animation: 'autoSlideProgress 4s linear forwards',
+          }}
+        />
+      </div>
+
+      {/* 7. Scroll Down Indicator */}
       <div
         onClick={onExplore}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 transition-opacity"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 transition-opacity"
       >
         <span className="text-[10px] tracking-[0.25em] text-[#C98A9F] font-bold uppercase mb-1">SCROLL</span>
         <ChevronDown className="w-4 h-4 text-[#FF6FA7] animate-bounce" />
       </div>
 
+      <style>{`
+        @keyframes autoSlideProgress {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}</style>
     </section>
   );
 };

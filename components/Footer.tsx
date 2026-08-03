@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { INSTAGRAM_PHOTOS } from '../data';
 import { ArrowRight, Facebook, Instagram, Youtube, Sparkles, Heart, ExternalLink } from 'lucide-react';
+import { GuruGaneshLogo } from './GuruGaneshLogo';
 
 interface FooterProps {
   onSelectCategory: (category: string) => void;
   onOpenModal: (title: string, content: string) => void;
+  onOpenAdmin?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onSelectCategory, onOpenModal }) => {
+export const Footer: React.FC<FooterProps> = ({ onSelectCategory, onOpenModal, onOpenAdmin }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -124,6 +126,15 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory, onOpenModal })
               <span className="w-1.5 h-1.5 bg-[#FF6FA7] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
               PAPERCLIP BRACELETS
             </button>
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                className="text-left text-[#FF6FA7] font-bold hover:text-white transition-colors py-1 flex items-center group mt-2 pt-2 border-t border-white/10"
+              >
+                <span className="w-1.5 h-1.5 bg-[#FF6FA7] rounded-full mr-2" />
+                👑 ADMIN CONCIERGE
+              </button>
+            )}
           </div>
 
           {/* Column 3: Luxury VIP Glow Club Newsletter (4 cols) */}
@@ -165,8 +176,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory, onOpenModal })
 
         {/* Bottom Bar: Copyright, Legal Links & Socials */}
         <div className="pt-10 flex flex-col sm:flex-row items-center justify-between text-xs text-white/60 space-y-4 sm:space-y-0">
-          <div className="font-serif tracking-wider text-white/80 text-sm">
-            &copy; {new Date().getFullYear()} <span className="text-[#E89AB5] uppercase font-sans text-xs">GURU GANESH JEWELRY</span>. All Rights Reserved.
+          <div className="flex items-center space-x-3">
+            <GuruGaneshLogo size={36} textColor="text-white" />
+            <span className="text-[11px] text-white/40 border-l border-white/20 pl-3">
+              &copy; {new Date().getFullYear()} All Rights Reserved.
+            </span>
           </div>
 
           <div className="flex space-x-6 uppercase font-bold tracking-wider text-[10px]">

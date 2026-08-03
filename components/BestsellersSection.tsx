@@ -1,6 +1,7 @@
 import React from 'react';
 import { Product } from '../types';
 import { Star, Eye, ShoppingBag, Heart, Sparkles, ArrowRight } from 'lucide-react';
+import { HoverImageSlider } from './HoverImageSlider';
 
 interface BestsellersSectionProps {
   products: Product[];
@@ -63,32 +64,11 @@ export const BestsellersSection: React.FC<BestsellersSectionProps> = ({
               )}
             </div>
 
-            {/* Product Image Box */}
-            <div
+            {/* Product Image Box with Auto Hover Slideshow */}
+            <HoverImageSlider
+              product={product}
               onClick={() => onSelectProduct(product)}
-              className="w-full aspect-square bg-[#FDEEF3]/60 overflow-hidden cursor-pointer relative mb-4 rounded-xs shimmer-hover"
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="card-image w-full h-full object-cover object-center"
-                referrerPolicy="no-referrer"
-              />
-
-              {/* Hover Quick View Overlay */}
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectProduct(product);
-                  }}
-                  className="bg-white/95 text-[#1E1E1E] hover:bg-[#FF6FA7] hover:text-white text-[11px] font-bold tracking-widest uppercase px-4 py-2.5 shadow-md transition-all flex items-center space-x-1.5 transform translate-y-2 group-hover:translate-y-0"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>VIEW PIECE</span>
-                </button>
-              </div>
-            </div>
+            />
 
             {/* Product Metadata */}
             <div className="space-y-1.5 mb-4">
