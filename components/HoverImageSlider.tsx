@@ -15,7 +15,7 @@ export const HoverImageSlider: React.FC<HoverImageSliderProps> = ({
 }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Combine main image and gallery images, ensuring unique valid URLs
   const imageList = React.useMemo(() => {
